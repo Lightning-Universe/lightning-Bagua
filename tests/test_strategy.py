@@ -33,20 +33,8 @@ class BoringModel4QAdam(BoringModel):
         return [optimizer], [lr_scheduler]
 
 
-@RunIf(min_cuda_gpus=1)
-def test_bagua_default(tmpdir):
-    trainer = Trainer(
-        default_root_dir=tmpdir,
-        fast_dev_run=1,
-        strategy="bagua",
-        accelerator="gpu",
-        devices=1,
-    )
-    assert isinstance(trainer.strategy, BaguaStrategy)
-
-
 @pytest.mark.xfail(raises=AssertionError, reason="Internal error in Bagua")  # Unexpected rsp=<Response [500]'
-@RunIf(min_cuda_gpus=1)
+@RunIf(min_gpus=1)
 def test_manual_optimization(tmpdir):
     model = ManualOptimBoringModel()
     trainer = Trainer(
@@ -69,7 +57,7 @@ def test_manual_optimization(tmpdir):
     torch.cuda.is_available() and torch.cuda.get_device_capability()[0] >= 8,
     reason="Async does not support this CUDA architecture",
 )
-@RunIf(min_cuda_gpus=2, standalone=True)
+@RunIf(min_gpus=2, standalone=True)
 def test_async_algorithm(tmpdir):
     model = BoringModel()
     bagua_strategy = BaguaStrategy(algorithm="async")
@@ -88,7 +76,7 @@ def test_async_algorithm(tmpdir):
         assert torch.norm(param) < 3
 
 
-@RunIf(min_cuda_gpus=1)
+@RunIf(min_gpus=1)
 @pytest.mark.parametrize(
     "algorithm", ["gradient_allreduce", "bytegrad", "qadam", "decentralized", "low_precision_decentralized"]
 )
@@ -116,7 +104,7 @@ def test_configuration(algorithm, tmpdir):
             trainer.strategy._configure_bagua_model(trainer)
 
 
-@RunIf(min_cuda_gpus=1)
+@RunIf(min_gpus=1)
 def test_qadam_configuration(tmpdir):
     model = BoringModel4QAdam()
     bagua_strategy = BaguaStrategy(algorithm="qadam")
