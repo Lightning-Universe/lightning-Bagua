@@ -9,6 +9,9 @@ on:  # Trigger the workflow on push or pull request, but only for the main branc
 
 # based on https://github.com/pypa/gh-action-pypi-publish
 
+env:
+  BAGUA_NO_INSTALL_DEPS: 1
+
 jobs:
   build:
     runs-on: ubuntu-latest
