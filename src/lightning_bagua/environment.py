@@ -15,13 +15,13 @@
 import logging
 import os
 
-from lightning.fabric.plugins import ClusterEnvironment
+from lightning_fabric.plugins import ClusterEnvironment
 
 log = logging.getLogger(__name__)
 
 
 class BaguaEnvironment(ClusterEnvironment):
-    """Environment for distributed training with `Bagua <https://tutorials.baguasys.com/>`_"""
+    """Environment for distributed training with `Bagua <https://tutorials.baguasys.com/>`_."""
 
     @property
     def creates_processes_externally(self) -> bool:

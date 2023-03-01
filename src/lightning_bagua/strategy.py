@@ -16,21 +16,21 @@ import os
 from typing import Any, Dict, List, Optional, Union
 
 import torch
+from lightning_fabric.plugins import CheckpointIO, ClusterEnvironment
+from lightning_fabric.utilities.optimizer import _optimizers_to_device
+from lightning_fabric.utilities.seed import reset_seed
+from lightning_fabric.utilities.types import ReduceOp
 from lightning_utilities.core.imports import module_available
+from pytorch_lightning import LightningModule, Trainer
+from pytorch_lightning.accelerators import Accelerator
+from pytorch_lightning.overrides.base import _LightningModuleWrapperBase, _LightningPrecisionModuleWrapperBase
+from pytorch_lightning.plugins.precision import PrecisionPlugin
+from pytorch_lightning.strategies.ddp import DDPStrategy
+from pytorch_lightning.strategies.strategy import TBroadcast
+from pytorch_lightning.trainer.states import TrainerFn
+from pytorch_lightning.utilities.exceptions import MisconfigurationException
 from torch import Tensor
 from torch.nn import Module
-
-import lightning.pytorch as pl
-from lightning.fabric.plugins import CheckpointIO, ClusterEnvironment
-from lightning.fabric.utilities.optimizer import _optimizers_to_device
-from lightning.fabric.utilities.seed import reset_seed
-from lightning.fabric.utilities.types import ReduceOp
-from lightning.pytorch.overrides.base import _LightningModuleWrapperBase, _LightningPrecisionModuleWrapperBase
-from lightning.pytorch.plugins.precision import PrecisionPlugin
-from lightning.pytorch.strategies.ddp import DDPStrategy
-from lightning.pytorch.strategies.strategy import TBroadcast
-from lightning.pytorch.trainer.states import TrainerFn
-from lightning.pytorch.utilities.exceptions import MisconfigurationException
 
 _BAGUA_AVAILABLE = module_available("bagua.torch_api")
 
@@ -38,8 +38,8 @@ if _BAGUA_AVAILABLE:
     import bagua.torch_api as bagua
     from bagua.torch_api.algorithms import Algorithm
     from bagua.torch_api.algorithms.q_adam import QAdamOptimizer
-    from bagua.torch_api.communication import allreduce_inplace, barrier, broadcast_object, is_initialized
     from bagua.torch_api.communication import ReduceOp as BaguaReduceOp
+    from bagua.torch_api.communication import allreduce_inplace, barrier, broadcast_object, is_initialized
     from bagua.torch_api.data_parallel.distributed import DistributedDataParallel_V1_9_0 as BaguaDistributedDataParallel
 
     # Convert a reduce op to its equivalent `bagua.torch_api.ReduceOp`
@@ -62,9 +62,11 @@ log = logging.getLogger(__name__)
 
 
 class LightningBaguaModule(_LightningModuleWrapperBase):
+    """Lightning Bagua Module."""
+
     def __init__(
         self,
-        forward_module: Union["pl.LightningModule", _LightningPrecisionModuleWrapperBase],
+        forward_module: Union[LightningModule, _LightningPrecisionModuleWrapperBase],
     ) -> None:
         super().__init__(forward_module=forward_module)
         # Bagua use `bagua_module_name` to distinguish different modules
@@ -87,28 +89,29 @@ class LightningBaguaModule(_LightningModuleWrapperBase):
                     # backward work.
                     trainer.model.inner.require_backward_grad_sync = False  # type: ignore[union-attr]
                 return output
-            else:
-                return super().forward(*inputs, **kwargs)
+            return super().forward(*inputs, **kwargs)
         return self._forward_module(*inputs, **kwargs)
 
 
 class BaguaStrategy(DDPStrategy):
+    """Bagua training strategy for Pytorch Lightning."""
+
     strategy_name = "bagua"
 
     def __init__(
         self,
         algorithm: str = "gradient_allreduce",
         flatten: bool = True,
-        accelerator: Optional["pl.accelerators.Accelerator"] = None,
+        accelerator: Optional[Accelerator] = None,
         parallel_devices: Optional[List[torch.device]] = None,
         cluster_environment: Optional[ClusterEnvironment] = None,
         checkpoint_io: Optional[CheckpointIO] = None,
         precision_plugin: Optional[PrecisionPlugin] = None,
         **bagua_kwargs: Union[Any, Dict[str, Any]],
     ):
-        """Strategy for training using the `Bagua <https://github.com/BaguaSys/bagua>`_ library, with advanced
-        distributed training algorithms and system optimizations.
+        """Strategy for training using the `Bagua <https://github.com/BaguaSys/bagua>`_ library.
 
+        It provides advanced distributed training algorithms and system optimizations.
         This strategy requires the `bagua` package to be installed. See
         `installation guide <https://tutorials.baguasys.com/installation>`_ for more information.
 
@@ -123,6 +126,11 @@ class BaguaStrategy(DDPStrategy):
             bagua_kwargs: Additional keyword arguments that will be passed to initialize the Bagua algorithm. More
                 details on keyword arguments accepted for each algorithm can be found in the
                 `documentation <https://bagua.readthedocs.io/en/latest/autoapi/bagua/torch_api/algorithms/index.html>`_.
+            accelerator: todo
+            parallel_devices: todo
+            cluster_environment: todo
+            checkpoint_io: todo
+            precision_plugin: todo
         """
         if not _BAGUA_AVAILABLE:
             raise MisconfigurationException(
@@ -177,7 +185,7 @@ class BaguaStrategy(DDPStrategy):
         os.environ["WORLD_SIZE"] = str(self.world_size)
         os.environ["LOCAL_RANK"] = str(self.local_rank)
 
-    def setup(self, trainer: "pl.Trainer") -> None:
+    def setup(self, trainer: Trainer) -> None:
         assert self.accelerator is not None
         self.accelerator.setup(trainer)
 
@@ -186,9 +194,8 @@ class BaguaStrategy(DDPStrategy):
 
         trainer_fn = trainer.state.fn
 
-        if trainer_fn == TrainerFn.FITTING:
-            if self._layer_sync and self.model:
-                self.model = self._layer_sync.apply(self.model)
+        if trainer_fn == TrainerFn.FITTING and self._layer_sync and self.model:
+            self.model = self._layer_sync.apply(self.model)
 
         self.setup_precision_plugin()
 
@@ -209,7 +216,7 @@ class BaguaStrategy(DDPStrategy):
 
         self._bagua_kwargs["q_adam_optimizer"] = self.optimizers[0]
 
-    def _configure_bagua_model(self, trainer: "pl.Trainer") -> None:
+    def _configure_bagua_model(self, trainer: Trainer) -> None:
         model = LightningBaguaModule(self.model)  # type: ignore[arg-type]
         self.model = self._setup_model(model)
 
@@ -218,8 +225,7 @@ class BaguaStrategy(DDPStrategy):
             self.model.bagua_algorithm.resume(self.model)  # type: ignore
 
     def _setup_model(self, model: Module) -> "BaguaDistributedDataParallel":
-        """Wraps the model into a Bagua distributed module."""
-
+        """Wrap the model into a Bagua distributed module."""
         if self._bagua_algorithm == "qadam":
             self._check_qadam_optimizer()
 

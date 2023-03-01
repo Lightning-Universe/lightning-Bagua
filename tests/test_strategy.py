@@ -15,13 +15,13 @@ from unittest import mock
 
 import pytest
 import torch
+from pytorch_lightning import Trainer
+from pytorch_lightning.demos.boring_classes import BoringModel, ManualOptimBoringModel
+from pytorch_lightning.trainer.states import TrainerFn
+from pytorch_lightning.utilities.exceptions import MisconfigurationException
 
-from lightning.pytorch import Trainer
-from lightning.pytorch.demos.boring_classes import BoringModel, ManualOptimBoringModel
-from lightning.pytorch.strategies import BaguaStrategy
-from lightning.pytorch.trainer.states import TrainerFn
-from lightning.pytorch.utilities.exceptions import MisconfigurationException
-from tests_pytorch.helpers.runif import RunIf
+from lightning_bagua.strategy import BaguaStrategy
+from tests import RunIf
 
 
 class BoringModel4QAdam(BoringModel):
@@ -33,7 +33,7 @@ class BoringModel4QAdam(BoringModel):
         return [optimizer], [lr_scheduler]
 
 
-@RunIf(min_cuda_gpus=1, bagua=True)
+@RunIf(min_cuda_gpus=1)
 def test_bagua_default(tmpdir):
     trainer = Trainer(
         default_root_dir=tmpdir,
@@ -46,7 +46,7 @@ def test_bagua_default(tmpdir):
 
 
 @pytest.mark.xfail(raises=AssertionError, reason="Internal error in Bagua")  # Unexpected rsp=<Response [500]'
-@RunIf(min_cuda_gpus=1, bagua=True)
+@RunIf(min_cuda_gpus=1)
 def test_manual_optimization(tmpdir):
     model = ManualOptimBoringModel()
     trainer = Trainer(
@@ -69,7 +69,7 @@ def test_manual_optimization(tmpdir):
     torch.cuda.is_available() and torch.cuda.get_device_capability()[0] >= 8,
     reason="Async does not support this CUDA architecture",
 )
-@RunIf(min_cuda_gpus=2, standalone=True, bagua=True)
+@RunIf(min_cuda_gpus=2, standalone=True)
 def test_async_algorithm(tmpdir):
     model = BoringModel()
     bagua_strategy = BaguaStrategy(algorithm="async")
@@ -88,7 +88,7 @@ def test_async_algorithm(tmpdir):
         assert torch.norm(param) < 3
 
 
-@RunIf(min_cuda_gpus=1, bagua=True)
+@RunIf(min_cuda_gpus=1)
 @pytest.mark.parametrize(
     "algorithm", ["gradient_allreduce", "bytegrad", "qadam", "decentralized", "low_precision_decentralized"]
 )
@@ -116,7 +116,7 @@ def test_configuration(algorithm, tmpdir):
             trainer.strategy._configure_bagua_model(trainer)
 
 
-@RunIf(min_cuda_gpus=1, bagua=True)
+@RunIf(min_cuda_gpus=1)
 def test_qadam_configuration(tmpdir):
     model = BoringModel4QAdam()
     bagua_strategy = BaguaStrategy(algorithm="qadam")
@@ -136,11 +136,3 @@ def test_qadam_configuration(tmpdir):
         "bagua.torch_api.data_parallel.bagua_distributed.BaguaDistributedDataParallel.__init__", return_value=None
     ), mock.patch("bagua.torch_api.communication.is_initialized", return_value=True):
         trainer.strategy._configure_bagua_model(trainer)
-
-
-def test_bagua_not_available(cuda_count_1, monkeypatch):
-    import lightning.pytorch.strategies.bagua as imports
-
-    monkeypatch.setattr(imports, "_BAGUA_AVAILABLE", False)
-    with pytest.raises(MisconfigurationException, match="you must have `Bagua` installed"):
-        Trainer(strategy="bagua", accelerator="gpu", devices=1)
