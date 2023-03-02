@@ -16,21 +16,38 @@ import os
 from typing import Any, Dict, List, Optional, Union
 
 import torch
-from lightning_fabric.plugins import CheckpointIO, ClusterEnvironment
-from lightning_fabric.utilities.optimizer import _optimizers_to_device
-from lightning_fabric.utilities.seed import reset_seed
-from lightning_fabric.utilities.types import ReduceOp
 from lightning_utilities.core.imports import module_available
-from pytorch_lightning import LightningModule, Trainer
-from pytorch_lightning.accelerators import Accelerator
-from pytorch_lightning.overrides.base import _LightningModuleWrapperBase, _LightningPrecisionModuleWrapperBase
-from pytorch_lightning.plugins.precision import PrecisionPlugin
-from pytorch_lightning.strategies.ddp import DDPStrategy
-from pytorch_lightning.strategies.strategy import TBroadcast
-from pytorch_lightning.trainer.states import TrainerFn
-from pytorch_lightning.utilities.exceptions import MisconfigurationException
 from torch import Tensor
 from torch.nn import Module
+
+if module_available("lightning"):
+    from lightning.fabric.plugins import CheckpointIO, ClusterEnvironment
+    from lightning.fabric.utilities.optimizer import _optimizers_to_device
+    from lightning.fabric.utilities.seed import reset_seed
+    from lightning.fabric.utilities.types import ReduceOp
+    from lightning.pytorch import LightningModule, Trainer
+    from lightning.pytorch.accelerators import Accelerator
+    from lightning.pytorch.overrides.base import _LightningModuleWrapperBase, _LightningPrecisionModuleWrapperBase
+    from lightning.pytorch.plugins.precision import PrecisionPlugin
+    from lightning.pytorch.strategies.ddp import DDPStrategy
+    from lightning.pytorch.strategies.strategy import TBroadcast
+    from lightning.pytorch.trainer.states import TrainerFn
+    from lightning.pytorch.utilities.exceptions import MisconfigurationException
+elif module_available("pytorch_lightning") and module_available("lightning_fabric"):
+    from lightning_fabric.plugins import CheckpointIO, ClusterEnvironment
+    from lightning_fabric.utilities.optimizer import _optimizers_to_device
+    from lightning_fabric.utilities.seed import reset_seed
+    from lightning_fabric.utilities.types import ReduceOp
+    from pytorch_lightning import LightningModule, Trainer
+    from pytorch_lightning.accelerators import Accelerator
+    from pytorch_lightning.overrides.base import _LightningModuleWrapperBase, _LightningPrecisionModuleWrapperBase
+    from pytorch_lightning.plugins.precision import PrecisionPlugin
+    from pytorch_lightning.strategies.ddp import DDPStrategy
+    from pytorch_lightning.strategies.strategy import TBroadcast
+    from pytorch_lightning.trainer.states import TrainerFn
+    from pytorch_lightning.utilities.exceptions import MisconfigurationException
+else:
+    raise ModuleNotFoundError("You are missing `lightning` or `pytorch-lightning` package, please install it.")
 
 _BAGUA_AVAILABLE = module_available("bagua.torch_api")
 

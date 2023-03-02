@@ -15,7 +15,14 @@
 import logging
 import os
 
-from lightning_fabric.plugins import ClusterEnvironment
+from lightning_utilities import module_available
+
+if module_available("lightning"):
+    from lightning.fabric.plugins import ClusterEnvironment
+elif module_available("lightning_fabric"):
+    from lightning_fabric.plugins import ClusterEnvironment
+else:
+    raise ModuleNotFoundError("You are missing `lightning` or `pytorch-lightning` package, please install it.")
 
 log = logging.getLogger(__name__)
 

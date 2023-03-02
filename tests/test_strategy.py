@@ -15,10 +15,18 @@ from unittest import mock
 
 import pytest
 import torch
-from pytorch_lightning import Trainer
-from pytorch_lightning.demos.boring_classes import BoringModel, ManualOptimBoringModel
-from pytorch_lightning.trainer.states import TrainerFn
-from pytorch_lightning.utilities.exceptions import MisconfigurationException
+from lightning_utilities import module_available
+
+if module_available("lightning"):
+    from lightning.pytorch import Trainer
+    from lightning.pytorch.demos.boring_classes import BoringModel, ManualOptimBoringModel
+    from lightning.pytorch.trainer.states import TrainerFn
+    from lightning.pytorch.utilities.exceptions import MisconfigurationException
+elif module_available("pytorch_lightning"):
+    from pytorch_lightning import Trainer
+    from pytorch_lightning.demos.boring_classes import BoringModel, ManualOptimBoringModel
+    from pytorch_lightning.trainer.states import TrainerFn
+    from pytorch_lightning.utilities.exceptions import MisconfigurationException
 
 from lightning_bagua.strategy import BaguaStrategy
 from tests import RunIf
