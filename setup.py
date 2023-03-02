@@ -50,7 +50,7 @@ def _prepare_extras(requirements_dir: str = _PATH_REQUIRES, skip_files: tuple = 
 # the goal of the project is simplicity for researchers, don't want to add too much
 # engineer specific practices
 setup(
-    name="lightning-Bagua",
+    name="lightning-bagua",
     version=about.__version__,
     description=about.__docs__,
     author=about.__author__,

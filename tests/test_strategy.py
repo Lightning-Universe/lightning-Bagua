@@ -42,7 +42,7 @@ def test_manual_optimization(tmpdir):
         limit_train_batches=1,
         limit_val_batches=0,
         max_epochs=1,
-        strategy="bagua",
+        strategy=BaguaStrategy(),
         accelerator="gpu",
         devices=1,
         logger=False,
@@ -60,11 +60,10 @@ def test_manual_optimization(tmpdir):
 @RunIf(min_gpus=2, standalone=True)
 def test_async_algorithm(tmpdir):
     model = BoringModel()
-    bagua_strategy = BaguaStrategy(algorithm="async")
     trainer = Trainer(
         default_root_dir=tmpdir,
         fast_dev_run=1,
-        strategy=bagua_strategy,
+        strategy=BaguaStrategy(algorithm="async"),
         accelerator="gpu",
         devices=2,
         enable_progress_bar=False,
@@ -82,11 +81,10 @@ def test_async_algorithm(tmpdir):
 )
 def test_configuration(algorithm, tmpdir):
     model = BoringModel()
-    bagua_strategy = BaguaStrategy(algorithm=algorithm)
     trainer = Trainer(
         default_root_dir=tmpdir,
         fast_dev_run=1,
-        strategy=bagua_strategy,
+        strategy=BaguaStrategy(algorithm=algorithm),
         accelerator="gpu",
         devices=1,
     )
@@ -107,11 +105,10 @@ def test_configuration(algorithm, tmpdir):
 @RunIf(min_gpus=1)
 def test_qadam_configuration(tmpdir):
     model = BoringModel4QAdam()
-    bagua_strategy = BaguaStrategy(algorithm="qadam")
     trainer = Trainer(
         default_root_dir=tmpdir,
         fast_dev_run=1,
-        strategy=bagua_strategy,
+        strategy=BaguaStrategy(algorithm="qadam"),
         accelerator="gpu",
         devices=1,
     )
