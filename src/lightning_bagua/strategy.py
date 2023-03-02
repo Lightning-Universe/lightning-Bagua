@@ -104,7 +104,7 @@ class LightningBaguaModule(_LightningModuleWrapperBase):
                     # Using bagua strategy, the model is redefined in model.inner
                     # and cannot be accessed directly. We need this to make manual
                     # backward work.
-                    trainer.model.inner.require_backward_grad_sync = False  # type: ignore[union-attr]
+                    trainer.model.inner.require_backward_grad_sync = False
                 return output
             return super().forward(*inputs, **kwargs)
         return self._forward_module(*inputs, **kwargs)
@@ -195,8 +195,8 @@ class BaguaStrategy(DDPStrategy):
         This enables the use of other cluster environments which don't set these exact variables, e.g., Bagua can be
         launched with ``torch.distributed.run``.
         """
-        os.environ["MASTER_ADDR"] = self.cluster_environment.main_address  # type: ignore[union-attr]
-        os.environ["MASTER_PORT"] = str(self.cluster_environment.main_port)  # type: ignore[union-attr]
+        os.environ["MASTER_ADDR"] = self.cluster_environment.main_address
+        os.environ["MASTER_PORT"] = str(self.cluster_environment.main_port)
         os.environ["RANK"] = str(self.global_rank)
         os.environ["NODE_RANK"] = str(self.node_rank)
         os.environ["WORLD_SIZE"] = str(self.world_size)
@@ -211,8 +211,8 @@ class BaguaStrategy(DDPStrategy):
 
         trainer_fn = trainer.state.fn
 
-        if trainer_fn == TrainerFn.FITTING and self._layer_sync and self.model:
-            self.model = self._layer_sync.apply(self.model)
+        if trainer_fn == TrainerFn.FITTING and self._layer_sync and self.model:  # type: ignore[has-type]
+            self.model = self._layer_sync.apply(self.model)  # type: ignore[has-type]
 
         self.setup_precision_plugin()
 
@@ -234,12 +234,12 @@ class BaguaStrategy(DDPStrategy):
         self._bagua_kwargs["q_adam_optimizer"] = self.optimizers[0]
 
     def _configure_bagua_model(self, trainer: Trainer) -> None:
-        model = LightningBaguaModule(self.model)  # type: ignore[arg-type]
+        model = LightningBaguaModule(self.model)
         self.model = self._setup_model(model)
 
         # start the background communication for async algorithm
         if trainer.training and self._bagua_algorithm == "async":
-            self.model.bagua_algorithm.resume(self.model)  # type: ignore
+            self.model.bagua_algorithm.resume(self.model)
 
     def _setup_model(self, model: Module) -> "BaguaDistributedDataParallel":
         """Wrap the model into a Bagua distributed module."""
@@ -266,7 +266,7 @@ class BaguaStrategy(DDPStrategy):
         # abort the background communication for async algorithm
         assert self.lightning_module is not None
         if self.lightning_module.trainer.training and self._bagua_algorithm == "async":
-            self.model.bagua_algorithm.abort(self.model)  # type: ignore
+            self.model.bagua_algorithm.abort(self.model)
 
         if isinstance(self.model, BaguaDistributedDataParallel):
             self.model = self.lightning_module
@@ -286,7 +286,7 @@ class BaguaStrategy(DDPStrategy):
         # and cannot be accessed directly. We need to redefine the
         # post_training_step function to make manual backward work.
         if not self.lightning_module.automatic_optimization:
-            self.model.inner.require_backward_grad_sync = True  # type: ignore[union-attr]
+            self.model.inner.require_backward_grad_sync = True
 
     def reduce(
         self, tensor: Tensor, group: Optional[Any] = None, reduce_op: Optional[Union[ReduceOp, str]] = "mean"
