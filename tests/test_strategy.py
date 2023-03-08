@@ -28,7 +28,7 @@ elif module_available("pytorch_lightning"):
     from pytorch_lightning.trainer.states import TrainerFn
     from pytorch_lightning.utilities.exceptions import MisconfigurationException
 
-from lightning_bagua.strategy import BaguaStrategy
+from lightning_bagua import BaguaStrategy
 from tests import RunIf
 
 
@@ -40,6 +40,16 @@ class BoringModel4QAdam(BoringModel):
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1)
         return [optimizer], [lr_scheduler]
 
+@RunIf(min_gpus=1)
+def test_bagua_default(tmpdir):
+    trainer = Trainer(
+        default_root_dir=tmpdir,
+        fast_dev_run=1,
+        strategy="bagua",
+        accelerator="gpu",
+        devices=1,
+    )
+    assert isinstance(trainer.strategy, BaguaStrategy)
 
 @pytest.mark.xfail(raises=AssertionError, reason="Internal error in Bagua")  # Unexpected rsp=<Response [500]'
 @RunIf(min_gpus=1)
