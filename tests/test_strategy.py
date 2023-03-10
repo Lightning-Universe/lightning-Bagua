@@ -40,6 +40,7 @@ class BoringModel4QAdam(BoringModel):
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1)
         return [optimizer], [lr_scheduler]
 
+
 @RunIf(min_gpus=1)
 def test_bagua_default(tmpdir):
     trainer = Trainer(
@@ -50,6 +51,7 @@ def test_bagua_default(tmpdir):
         devices=1,
     )
     assert isinstance(trainer.strategy, BaguaStrategy)
+
 
 @pytest.mark.xfail(raises=AssertionError, reason="Internal error in Bagua")  # Unexpected rsp=<Response [500]'
 @RunIf(min_gpus=1)

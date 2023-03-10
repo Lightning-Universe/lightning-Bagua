@@ -31,6 +31,7 @@ Simply set the strategy argument in the Trainer:
 
 ```python
 from lightning import Trainer
+
 # train on 4 GPUs (using Bagua mode)
 trainer = Trainer(strategy="bagua", accelerator="gpu", devices=4)
 ```
@@ -85,12 +86,14 @@ import lightning.pytorch as pl
 from lightning_bagua import BaguaStrategy
 from bagua.torch_api.algorithms.q_adam import QAdamOptimizer
 
+
 class MyModel(pl.LightningModule):
     ...
 
     def configure_optimizers(self):
         # initialize QAdam Optimizer
         return QAdamOptimizer(self.parameters(), lr=0.05, warmup_steps=100)
+
 
 model = MyModel()
 trainer = Trainer(
