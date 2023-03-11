@@ -1,5 +1,6 @@
 # Lightning Bagua
 
+[![lightning](https://img.shields.io/badge/-Lightning_2.0+-792ee5?logo=pytorchlightning&logoColor=white)](https://lightning.ai/)
 [![PyPI Status](https://badge.fury.io/py/lightning-bagua.svg)](https://badge.fury.io/py/lightning-bagua)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/lightning-bagua)](https://pypi.org/project/lightning-bagua/)
 [![PyPI Status](https://pepy.tech/badge/lightning-bagua)](https://pepy.tech/project/lightning-bagua)
