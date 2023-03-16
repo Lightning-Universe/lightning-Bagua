@@ -1,4 +1,6 @@
-# Lightning Bagua
+# Lightning + Bagua
+
+**Deep Learning Training Acceleration with [Bagua](https://tutorials.baguasys.com/) and [Lightning AI](https://lightning.ai)**
 
 [![lightning](https://img.shields.io/badge/-Lightning_2.0+-792ee5?logo=pytorchlightning&logoColor=white)](https://lightning.ai/)
 [![PyPI Status](https://badge.fury.io/py/lightning-bagua.svg)](https://badge.fury.io/py/lightning-bagua)
@@ -20,7 +22,19 @@ training algorithms including:
 
 By default, Bagua uses *Gradient AllReduce* algorithm, which is also the algorithm implemented in DDP, but Bagua can usually produce a higher training throughput due to its backend written in Rust.
 
+## Installation
+
+```bash
+pip install -U lightning lightning-bagua
+```
+
+## Usage
+
+Simply set the strategy argument in the Trainer:
+
 ```python
+from lightning import Trainer
+
 # train on 4 GPUs (using Bagua mode)
 trainer = Trainer(strategy="bagua", accelerator="gpu", devices=4)
 ```
@@ -28,6 +42,9 @@ trainer = Trainer(strategy="bagua", accelerator="gpu", devices=4)
 By specifying the `algorithm` in the `BaguaStrategy`, you can select more advanced training algorithms featured by Bagua:
 
 ```python
+from lightning import Trainer
+from lightning_bagua import BaguaStrategy
+
 # train on 4 GPUs, using Bagua Gradient AllReduce algorithm
 trainer = Trainer(
     strategy=BaguaStrategy(algorithm="gradient_allreduce"),
@@ -67,7 +84,9 @@ trainer = Trainer(
 To use *QAdam*, we need to initialize [QAdamOptimizer](https://bagua.readthedocs.io/en/latest/autoapi/bagua/torch_api/algorithms/q_adam/index.html#bagua.torch_api.algorithms.q_adam.QAdamOptimizer) first:
 
 ```python
-from pytorch_lightning.strategies import BaguaStrategy
+from lightning import Trainer
+import lightning.pytorch as pl
+from lightning_bagua import BaguaStrategy
 from bagua.torch_api.algorithms.q_adam import QAdamOptimizer
 
 

@@ -28,7 +28,7 @@ elif module_available("pytorch_lightning"):
     from pytorch_lightning.trainer.states import TrainerFn
     from pytorch_lightning.utilities.exceptions import MisconfigurationException
 
-from lightning_bagua.strategy import BaguaStrategy
+from lightning_bagua import BaguaStrategy
 from tests import RunIf
 
 
