@@ -1,4 +1,4 @@
-# Lightning + Bagua
+# Lightning ⚡ Bagua
 
 **Deep Learning Training Acceleration with [Bagua](https://tutorials.baguasys.com/) and [Lightning AI](https://lightning.ai)**
 
@@ -25,7 +25,7 @@ By default, Bagua uses *Gradient AllReduce* algorithm, which is also the algorit
 ## Installation
 
 ```bash
-pip install -U lightning lightning-bagua
+pip install -U lightning-bagua
 ```
 
 ## Usage
@@ -84,13 +84,12 @@ trainer = Trainer(
 To use *QAdam*, we need to initialize [QAdamOptimizer](https://bagua.readthedocs.io/en/latest/autoapi/bagua/torch_api/algorithms/q_adam/index.html#bagua.torch_api.algorithms.q_adam.QAdamOptimizer) first:
 
 ```python
-from lightning import Trainer
-import lightning.pytorch as pl
+import lightning as L
 from lightning_bagua import BaguaStrategy
 from bagua.torch_api.algorithms.q_adam import QAdamOptimizer
 
 
-class MyModel(pl.LightningModule):
+class MyModel(L.LightningModule):
     ...
 
     def configure_optimizers(self):
@@ -99,7 +98,7 @@ class MyModel(pl.LightningModule):
 
 
 model = MyModel()
-trainer = Trainer(
+trainer = L.Trainer(
     accelerator="gpu",
     devices=4,
     strategy=BaguaStrategy(algorithm="qadam"),
