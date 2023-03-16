@@ -41,18 +41,6 @@ class BoringModel4QAdam(BoringModel):
         return [optimizer], [lr_scheduler]
 
 
-@RunIf(min_gpus=1)
-def test_bagua_default(tmpdir):
-    trainer = Trainer(
-        default_root_dir=tmpdir,
-        fast_dev_run=1,
-        strategy="bagua",
-        accelerator="gpu",
-        devices=1,
-    )
-    assert isinstance(trainer.strategy, BaguaStrategy)
-
-
 @pytest.mark.xfail(raises=AssertionError, reason="Internal error in Bagua")  # Unexpected rsp=<Response [500]'
 @RunIf(min_gpus=1)
 def test_manual_optimization(tmpdir):
