@@ -73,7 +73,7 @@ setup(
     extras_require=_prepare_extras(),
     project_urls={
         "Bug Tracker": "https://github.com/Lightning-AI/lightning-Bagua/issues",
-        "Documentation": "https://lightning-Bagua.rtfd.io/en/latest/",
+        "Documentation": "https://lightning-ai.github.io/lightning-bagua/",
         "Source Code": "https://github.com/Lightning-AI/lightning-Bagua",
     },
     classifiers=[
@@ -81,7 +81,7 @@ setup(
         "Natural Language :: English",
         # How mature is this project? Common values are
         #   3 - Alpha, 4 - Beta, 5 - Production/Stable
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         # Indicate who your project is intended for
         "Intended Audience :: Developers",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
