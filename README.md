@@ -8,12 +8,12 @@
 [![PyPI Status](https://pepy.tech/badge/lightning-bagua)](https://pepy.tech/project/lightning-bagua)
 [![Deploy Docs](https://github.com/Lightning-AI/lightning-Bagua/actions/workflows/docs-deploy.yml/badge.svg)](https://lightning-ai.github.io/lightning-Bagua/)
 
-[![General checks](https://github.com/Lightning-AI/lightning-bagua/actions/workflows/ci-checks.yml/badge.svg?event=push)](https://github.com/Lightning-AI/lightning-bagua/actions/workflows/ci-checks.yml)
-[![Build Status](https://dev.azure.com/Lightning-AI/compatibility/_apis/build/status%2Fstrategies%2FLightning-Universe.lit-strategy-Bagua?branchName=main)](https://dev.azure.com/Lightning-AI/compatibility/_build/latest?definitionId=63&branchName=main)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Lightning-AI/lightning-Bagua/main.svg)](https://results.pre-commit.ci/latest/github/Lightning-AI/lightning-Bagua/main)
+[![General checks](https://github.com/Lightning-Universe/lightning-Bagua/actions/workflows/ci-checks.yml/badge.svg?event=push)](https://github.com/Lightning-Universe/lightning-Bagua/actions/workflows/ci-checks.yml)
+[![Build Status](https://dev.azure.com/Lightning-AI/compatibility/_apis/build/status%2Fstrategies%2FLightning-Universe.lightning-Bagua?branchName=main)](https://dev.azure.com/Lightning-AI/compatibility/_build/latest?definitionId=68&branchName=main)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Lightning-Universe/lightning-Bagua/main.svg)](https://results.pre-commit.ci/latest/github/Lightning-Universe/lightning-Bagua/main)
 
-[Bagua](https://github.com/BaguaSys/bagua) is a deep learning training acceleration framework which supports multiple advanced distributed
-training algorithms including:
+[Bagua](https://github.com/BaguaSys/bagua) is a deep learning training acceleration framework that supports multiple advanced distributed
+training algorithms, including:
 
 - [Gradient AllReduce](https://tutorials.baguasys.com/algorithms/gradient-allreduce) for centralized synchronous communication, where gradients are averaged among all workers.
 - [Decentralized SGD](https://tutorials.baguasys.com/algorithms/decentralized) for decentralized synchronous communication, where each worker exchanges data with one or a few specific workers.
