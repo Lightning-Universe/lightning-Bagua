@@ -226,7 +226,7 @@ class BaguaStrategy(DDPStrategy):
             self._configure_bagua_model(trainer)
 
     def _check_qadam_optimizer(self) -> None:
-        has_qadam_optimizer = any([isinstance(opt, QAdamOptimizer) for opt in self.optimizers])
+        has_qadam_optimizer = any(isinstance(opt, QAdamOptimizer) for opt in self.optimizers)
 
         if not has_qadam_optimizer or len(self.optimizers) > 1 or len(self.lr_scheduler_configs) > 1:
             raise MisconfigurationException("Bagua QAdam can only accept one QAdamOptimizer and one LR Scheduler.")
