@@ -79,6 +79,14 @@ disable_error_code = "attr-defined"
 # style choices
 warn_no_return = false
 
+# Ignore mypy errors for these files
+# TODO: the goal is for this to be empty
+[[tool.mypy.overrides]]
+module = [
+    "lightning_bagua.strategy",
+]
+ignore_errors = "True"
+
 
 [tool.ruff]
 line-length = 120

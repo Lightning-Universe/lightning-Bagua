@@ -6,7 +6,7 @@
 [![PyPI Status](https://badge.fury.io/py/lightning-bagua.svg)](https://badge.fury.io/py/lightning-bagua)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/lightning-bagua)](https://pypi.org/project/lightning-bagua/)
 [![PyPI Status](https://pepy.tech/badge/lightning-bagua)](https://pepy.tech/project/lightning-bagua)
-[![Deploy Docs](https://github.com/Lightning-AI/lightning-Bagua/actions/workflows/docs-deploy.yml/badge.svg)](https://lightning-ai.github.io/lightning-Bagua/)
+[![Deploy Docs](https://github.com/Lightning-Universe/lightning-Bagua/actions/workflows/docs-deploy.yml/badge.svg?event=push)](https://lightning-universe.github.io/lightning-Bagua/)
 
 [![General checks](https://github.com/Lightning-Universe/lightning-Bagua/actions/workflows/ci-checks.yml/badge.svg?event=push)](https://github.com/Lightning-Universe/lightning-Bagua/actions/workflows/ci-checks.yml)
 [![Build Status](https://dev.azure.com/Lightning-AI/compatibility/_apis/build/status%2Fstrategies%2FLightning-Universe.lightning-Bagua?branchName=main)](https://dev.azure.com/Lightning-AI/compatibility/_build/latest?definitionId=68&branchName=main)
